@@ -95,7 +95,22 @@ async def on_message(message):
                     await message.author.add_roles(role)
                     await message.reply(v['name_JA'] + 'のタイマーをONにしました')
 
-
+    #曜日を日本語に変換(Herokuが日本時間のロケールに対応していないため)
+    def weekday_convert(weekday):
+        if weekday == 'Mon':
+            return '月'
+        elif weekday == 'Tue':
+            return '火'
+        elif weekday == 'Wed':
+            return '水'
+        elif weekday == 'Thu':
+            return '木'
+        elif weekday == 'Fri':
+            return '金'
+        elif weekday == 'Sat':
+            return '土'
+        elif weekday == 'Sun':
+            return '日'
     
     #スケジュール
     if message.channel.id == CHANNEL_ID_SCHEDULE:
@@ -108,8 +123,10 @@ async def on_message(message):
                 fishing_dates = schedule_calc(v['name_EN'])
 
                 for fishing_date in fishing_dates:
-                    #TODO Herokuに日本語のロケールがないので、曜日を日本語にするなら独自の関数を実行する必要がある
-                    msg += fishing_date.strftime('%Y/%m/%d(%a) %H:%M') + '\n'
+
+                    weekday = fishing_date.strftime('%a')
+                    weekday_JA = weekday_convert(weekday)
+                    msg += fishing_date.strftime('%Y/%m/%d(') + weekday_JA + fishing_date.strftime(') %H:%M') + '\n'
             
                 msg += '```'
                 await message.reply(msg)
